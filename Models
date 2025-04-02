@@ -1,0 +1,10 @@
+Classification Models:
+
+Random Forest Classifier
+XGBoost Classifier
+
+Regression Models:
+Linear Regression
+Random Forest Regressor
+XGBoost Regressor
+LSTM (Long Short-Term Memory) Neural Network
