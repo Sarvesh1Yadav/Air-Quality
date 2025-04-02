@@ -80,12 +80,4 @@ The dataset used in this project is `data.csv`, which contains various air quali
 - Mean Squared Error (MSE)
 - R² Score
 
-## 📜 License
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-Feel free to fork this repository, make improvements, and submit a pull request!
-
-## 📧 Contact
-For any inquiries, reach out to [Your Email].
 
