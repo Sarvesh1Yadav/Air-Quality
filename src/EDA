@@ -1,0 +1,193 @@
+"""# Analysis by type and pollution means"""
+
+grp = df.groupby(["type"])["so2"].mean().to_frame()
+grp.plot.bar(figsize = (20,10), color={"orange"})
+
+grp = df.groupby(["type"])["no2"].mean().to_frame()
+grp.plot.bar(figsize = (20,10), color={"purple"})
+
+"""# SO2 variation Statewise"""
+
+import matplotlib.pyplot as plt
+
+df[['so2', 'state']].groupby(['state']).median().sort_values("so2", ascending=False).plot(
+    kind='bar', figsize=(20, 10), color='skyblue', edgecolor='black'
+)
+
+plt.title("Median SO₂ Levels by State", fontsize=20)
+plt.xlabel("State", fontsize=15)
+plt.ylabel("Median SO₂ Level", fontsize=15)
+plt.xticks(rotation=45, ha='right')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.show()
+
+df[['so2', 'year']].groupby("year").median().sort_values(by='year', ascending=False).plot(
+    kind='line', marker='o', figsize=(16, 8), color='b', title="Median SO₂ Levels Over Years"
+)
+
+"""# NO2 Analysis"""
+
+import matplotlib.pyplot as plt
+
+df[['no2', 'state']].groupby(['state']).median().sort_values("no2", ascending=False).plot.bar(
+    figsize=(20, 10), color='indianred', edgecolor='black'
+)
+
+plt.title("Median NO₂ Levels by State", fontsize=18)
+plt.xlabel("State", fontsize=14)
+plt.ylabel("Median NO₂ Level", fontsize=14)
+plt.xticks(rotation=45, ha="right")
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+plt.show()
+
+df[['no2', 'year']].groupby("year").median().sort_values(by='year', ascending=False).plot(
+    kind='line', marker='o', figsize=(16, 8), color='b', title="Median NO₂ Levels Over Years"
+)
+
+"""# Function to calculate so2 individual pollutant index(si)"""
+
+def cal_SOi(so2):
+    si=0
+    if (so2<=40):
+     si= so2*(50/40)
+    elif (so2>40 and so2<=80):
+     si= 50+(so2-40)*(50/40)
+    elif (so2>80 and so2<=380):
+     si= 100+(so2-80)*(100/300)
+    elif (so2>380 and so2<=800):
+     si= 200+(so2-380)*(100/420)
+    elif (so2>800 and so2<=1600):
+     si= 300+(so2-800)*(100/800)
+    elif (so2>1600):
+     si= 400+(so2-1600)*(100/800)
+    return si
+df['SOi']=df['so2'].apply(cal_SOi)
+data= df[['so2','SOi']]
+data.head()
+
+"""# Function to calculate no2 individual pollutant index(ni)"""
+
+def cal_Noi(no2):
+    ni=0
+    if(no2<=40):
+     ni= no2*50/40
+    elif(no2>40 and no2<=80):
+     ni= 50+(no2-40)*(50/40)
+    elif(no2>80 and no2<=180):
+     ni= 100+(no2-80)*(100/100)
+    elif(no2>180 and no2<=280):
+     ni= 200+(no2-180)*(100/100)
+    elif(no2>280 and no2<=400):
+     ni= 300+(no2-280)*(100/120)
+    else:
+     ni= 400+(no2-400)*(100/120)
+    return ni
+df['NOi']=df['no2'].apply(cal_Noi)
+data= df[['no2','NOi']]
+data.head()
+
+"""# Function to calculate rspm individual pollutant index(rpi)"""
+
+df['rspm'].unique()
+
+def cal_RSPMI(rspm):
+    if rspm <= 30:
+        rpi = rspm * 50 / 30
+    elif rspm <= 60:
+        rpi = 50 + (rspm - 30) * 50 / 30
+    elif rspm <= 90:
+        rpi = 100 + (rspm - 60) * 100 / 30
+    elif rspm <= 120:
+        rpi = 200 + (rspm - 90) * 100 / 30
+    elif rspm <= 250:
+        rpi = 300 + (rspm - 120) * (100 / 130)
+    else:
+        rpi = 400 + (rspm - 250) * (100 / 130)
+
+
+    return rpi
+
+df['Rpi'] = df['rspm'].apply(cal_RSPMI)
+
+print(df[['rspm', 'Rpi']].sample(10))
+
+"""# Function to calculate spm individual pollutant index(spi)"""
+
+def cal_SPMi(spm):
+    spi=0
+    if(spm<=50):
+     spi=spm*50/50
+    elif(spm>50 and spm<=100):
+     spi=50+(spm-50)*(50/50)
+    elif(spm>100 and spm<=250):
+     spi= 100+(spm-100)*(100/150)
+    elif(spm>250 and spm<=350):
+     spi=200+(spm-250)*(100/100)
+    elif(spm>350 and spm<=430):
+     spi=300+(spm-350)*(100/80)
+    else:
+     spi=400+(spm-430)*(100/430)
+    return spi
+
+df['SPMi']=df['spm'].apply(cal_SPMi)
+# data= df[['spm','SPMi']]
+print(df[['spm', 'SPMi']].sample(10))
+
+"""# Function to calculate the air quality index (AQI) of every data value"""
+
+def cal_aqi(si,ni,rspmi,spmi):
+    aqi=0
+    if(si>ni and si>rspmi and si>spmi):
+     aqi=si
+    if(ni>si and ni>rspmi and ni>spmi):
+     aqi=ni
+    if(rspmi>si and rspmi>ni and rspmi>spmi):
+     aqi=rspmi
+    if(spmi>si and spmi>ni and spmi>rspmi):
+     aqi=spmi
+    return aqi
+
+df['AQI']=df.apply(lambda x:cal_aqi(x['SOi'],x['NOi'],x['Rpi'],x['SPMi']),axis=1)
+data= df[['state','SOi','NOi','Rpi','SPMi','AQI']]
+data.sample(5)
+
+def AQI_Range(x):
+    if x<=50:
+        return "Good"
+    elif x>50 and x<=100:
+        return "Moderate"
+    elif x>100 and x<=200:
+        return "Poor"
+    elif x>200 and x<=300:
+        return "Unhealthy"
+    elif x>300 and x<=400:
+        return "Very unhealthy"
+    elif x>400:
+        return "Hazardous"
+
+df['AQI_Range'] = df['AQI'] .apply(AQI_Range)
+df.sample(5)
+
+df.info()
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df["type"] = le.fit_transform(df["type"])
+
+df.info()
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df["AQI_Range"] = le.fit_transform(df["AQI_Range"])
+
+df.info()
+
+df.columns
+
+df.head(2)
+
+df.columns
+
+df.columns
