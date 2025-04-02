@@ -46,31 +46,3 @@ scikit-learn
 xgboost
 tensorflow
 
-You can install these libraries using:
-pip install -r requirements.txt
-
-##Usage
-Clone the repository to your local machine.
-Navigate to the project directory. 3. Install the required libraries using pip install -r requirements.txt.   
-Open and run the train_ai (1).ipynb Jupyter Notebook.
-##Data Source
-The dataset used in this project is data.csv.
-
-##Models Used
-Classification:
-Random Forest Classifier
-XGBoost Classifier
-Regression:
-Linear Regression
-Random Forest Regressor
-XGBoost Regressor
-LSTM (Long Short-Term Memory) Neural Network
-##Evaluation Metrics
-Classification:
-Accuracy
-Classification Report
-Confusion Matrix
-Regression:
-Mean Absolute Error (MAE)
-Mean Squared Error (MSE)
-R² Score
